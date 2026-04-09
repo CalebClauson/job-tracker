@@ -1,5 +1,6 @@
 import tkinter as tk
 from job import Job
+from db import insert_job, view_db, clear_db
 
 TITLE_FONT = ("Helvetica", 18, "bold")
 BUTTON_FONT = ("Helvetica", 12)
@@ -21,17 +22,12 @@ def start_gui():
     company_entry = None
     title_entry = None
     status_entry = None
+    status_var = None
     date_applied_entry = None
     location_entry = None
     notes_entry = None
     link_entry = None
 
-    #temporary db dict for testing
-    jobs = [
-    "Apple - Software Developer - Applied",
-    "Google - IT Support - Interview",
-    "Cummins - Analyst - Rejected"
-    ]
 
     #frame definition
     top_frame = tk.Frame(root, bg=BG_MAIN)
@@ -73,18 +69,19 @@ def start_gui():
 
     #helper for backend
     def on_save_job():
-        nonlocal company_entry, title_entry, status_entry, date_applied_entry, location_entry, notes_entry, link_entry
+        nonlocal company_entry, title_entry, status_var, date_applied_entry, location_entry, notes_entry, link_entry
         job = Job(
             company_entry.get(),
             title_entry.get(),
-            status_entry.get(),
+            status_var.get(),
             date_applied_entry.get(),
             location_entry.get(),
             notes_entry.get(),
             link_entry.get()
         )
         #backend for inserting into db
-        #insert_job(job)
+        insert_job(job)
+  
     
     def on_edit_job():
         return
@@ -99,10 +96,11 @@ def start_gui():
 
         tk.Button(button_frame, bg=BG_WIDGET, fg=FG_TEXT, text="Add Job", font=BUTTON_FONT, width=15, command=add_job).grid(row=0, column=0, padx=10, pady=10)
         tk.Button(button_frame, bg=BG_WIDGET, fg=FG_TEXT,  text="View Jobs", font=BUTTON_FONT, width=15, command=view_jobs).grid(row=0, column=1, padx=10, pady=10)
-        tk.Button(bot_frame, bg=BG_WIDGET, fg=FG_TEXT, text="Exit", font=BUTTON_FONT, width=15, command=root.destroy).grid(row=1, column=0, columnspan=2, pady=10)
+        tk.Button(bot_frame, bg=BG_ACTIVE, fg=FG_TEXT, text="Clear DB", font=BUTTON_FONT, width=15, command=clear_db).grid(row=1, column=1, columnspan=2, pady=100)
+        tk.Button(bot_frame, bg=BG_ACTIVE, fg=FG_TEXT, text="Exit", font=BUTTON_FONT, width=15, command=root.destroy).grid(row=2, column=0, columnspan=2, pady=100)
 
     def render_add_job():
-        nonlocal company_entry, title_entry, status_entry, date_applied_entry, location_entry, notes_entry, link_entry
+        nonlocal company_entry, title_entry, status_var, status_entry, date_applied_entry, location_entry, notes_entry, link_entry
 
         title_label = tk.Label(top_frame, bg=BG_MAIN, fg=FG_TEXT, text="Add Job Application", font=TITLE_FONT)
         title_label.pack(pady=20)
@@ -117,7 +115,9 @@ def start_gui():
         
         company_entry = tk.Entry(mid_frame, bg=BG_WIDGET, fg=FG_TEXT, font=BUTTON_FONT, width=15)
         title_entry = tk.Entry(mid_frame, bg=BG_WIDGET, fg=FG_TEXT, font=BUTTON_FONT, width=15)
-        status_entry = tk.Entry(mid_frame, bg=BG_WIDGET, fg=FG_TEXT, font=BUTTON_FONT, width=15)
+        status_var = tk.StringVar(value="Applied")
+        status_entry = tk.OptionMenu(mid_frame, status_var, "Applied", "Interview", "Rejected", "Offer")
+        status_entry.config(bg=BG_WIDGET, fg=FG_TEXT, font=BUTTON_FONT, width=12)
         date_applied_entry = tk.Entry(mid_frame, bg=BG_WIDGET, fg=FG_TEXT, font=BUTTON_FONT, width=15)
         location_entry = tk.Entry(mid_frame, bg=BG_WIDGET, fg=FG_TEXT, font=BUTTON_FONT, width=15)
         notes_entry = tk.Entry(mid_frame, bg=BG_WIDGET, fg=FG_TEXT, font=BUTTON_FONT, width=15)
@@ -135,6 +135,8 @@ def start_gui():
         tk.Button(bot_frame, bg=BG_WIDGET, fg=FG_TEXT, text="Back", font=BUTTON_FONT, width=15, command=main_menu).grid(row=1, column=0, columnspan=1, pady=10)
 
     def render_view_job():
+        jobs = view_db()
+
         title_label = tk.Label(top_frame, bg=BG_MAIN, fg=FG_TEXT, text="Job Applications", font=TITLE_FONT)
         title_label.pack(pady=20)
 

@@ -1,5 +1,5 @@
 import sqlite3
-from job import job
+from job import Job
 
 #LEFT FOR CONTEXT OF DB
 #Initial Database created
@@ -15,11 +15,24 @@ from job import job
 #             link TEXT
 #            )""")
 
-conn = sqlite3.connect("jobs.db")
-cursor = conn.cursor()
+def insert_job(job):
+    conn = sqlite3.connect("jobs.db")
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO jobs (company, title, status, date_applied, location, notes, link) VALUES (?, ?, ?, ?, ?, ?, ?)", job.to_tuple())
+    conn.commit()
+    conn.close()
 
-conn.execute("SELECT * FROM jobs")
-conn.commit()
+def view_db():
+    conn = sqlite3.connect("jobs.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM jobs")
+    db = cursor.fetchall()
+    conn.close()
+    return db
 
-print(cursor.fetchall())
-conn.close()
+def clear_db():
+    conn = sqlite3.connect("jobs.db")
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM jobs")
+    conn.commit()
+    conn.close()
