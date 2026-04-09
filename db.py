@@ -30,6 +30,17 @@ def view_db():
     conn.close()
     return db
 
+def update_db(edit_job_id, job):
+    conn = sqlite3.connect("jobs.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE jobs SET company = ?, title = ?, status = ?, date_applied = ?, location = ?, notes = ?, link = ? WHERE id = ?",
+        job.to_tuple() + (edit_job_id,)
+    )
+    conn.commit()
+    conn.close()
+
+
 def clear_db():
     conn = sqlite3.connect("jobs.db")
     cursor = conn.cursor()
