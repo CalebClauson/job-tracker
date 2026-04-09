@@ -1,4 +1,5 @@
 import tkinter as tk
+from job import Job
 
 TITLE_FONT = ("Helvetica", 18, "bold")
 BUTTON_FONT = ("Helvetica", 12)
@@ -16,7 +17,23 @@ def start_gui():
     root.configure(bg=BG_MAIN)
     state = "main"
 
-    #frame
+    #initializing variables for job class
+    company_entry = None
+    title_entry = None
+    status_entry = None
+    date_applied_entry = None
+    location_entry = None
+    notes_entry = None
+    link_entry = None
+
+    #temporary db dict for testing
+    jobs = [
+    "Apple - Software Developer - Applied",
+    "Google - IT Support - Interview",
+    "Cummins - Analyst - Rejected"
+    ]
+
+    #frame definition
     top_frame = tk.Frame(root, bg=BG_MAIN)
     top_frame.pack()
 
@@ -26,11 +43,50 @@ def start_gui():
     bot_frame = tk.Frame(root, bg=BG_MAIN)
     bot_frame.pack()
 
-    #helper
-    def add_job():
-        return
+    #helper for frames / state changer
+    def clear_frame(frame):
+        for widget in frame.winfo_children():
+            widget.destroy()
     
+    def clear_all_frames():
+        for frame in (top_frame, mid_frame, bot_frame):
+            for widget in frame.winfo_children():
+                widget.destroy()
+
+    def main_menu():
+        nonlocal state
+        clear_all_frames()
+        state = "main"
+        render_main()
+
+    def add_job():
+        nonlocal state
+        clear_all_frames()
+        state = "add_job"
+        render_add_job()
+
     def view_jobs():
+        nonlocal state
+        clear_all_frames()
+        state = "view_jobs"
+        render_view_job()
+
+    #helper for backend
+    def on_save_job():
+        nonlocal company_entry, title_entry, status_entry, date_applied_entry, location_entry, notes_entry, link_entry
+        job = Job(
+            company_entry.get(),
+            title_entry.get(),
+            status_entry.get(),
+            date_applied_entry.get(),
+            location_entry.get(),
+            notes_entry.get(),
+            link_entry.get()
+        )
+        #backend for inserting into db
+        #insert_job(job)
+    
+    def on_edit_job():
         return
 
     #state functions
@@ -46,16 +102,54 @@ def start_gui():
         tk.Button(bot_frame, bg=BG_WIDGET, fg=FG_TEXT, text="Exit", font=BUTTON_FONT, width=15, command=root.destroy).grid(row=1, column=0, columnspan=2, pady=10)
 
     def render_add_job():
-        return
+        nonlocal company_entry, title_entry, status_entry, date_applied_entry, location_entry, notes_entry, link_entry
+
+        title_label = tk.Label(top_frame, bg=BG_MAIN, fg=FG_TEXT, text="Add Job Application", font=TITLE_FONT)
+        title_label.pack(pady=20)
+    
+        tk.Label(mid_frame, bg=BG_MAIN, fg=FG_TEXT, text="Company:", font=BUTTON_FONT, width=15).grid(row=0, column=0, padx=10, pady=10)
+        tk.Label(mid_frame, bg=BG_MAIN, fg=FG_TEXT, text="Job Title:", font=BUTTON_FONT, width=15).grid(row=1, column=0, padx=10, pady=10)
+        tk.Label(mid_frame, bg=BG_MAIN, fg=FG_TEXT, text="Status:", font=BUTTON_FONT, width=15).grid(row=2, column=0, padx=10, pady=10)
+        tk.Label(mid_frame, bg=BG_MAIN, fg=FG_TEXT, text="Date Applied:", font=BUTTON_FONT, width=15).grid(row=3, column=0, padx=10, pady=10)
+        tk.Label(mid_frame, bg=BG_MAIN, fg=FG_TEXT, text="Location:", font=BUTTON_FONT, width=15).grid(row=4, column=0, padx=10, pady=10)
+        tk.Label(mid_frame, bg=BG_MAIN, fg=FG_TEXT, text="Notes:", font=BUTTON_FONT, width=15).grid(row=5, column=0, padx=10, pady=10)
+        tk.Label(mid_frame, bg=BG_MAIN, fg=FG_TEXT, text="Link:", font=BUTTON_FONT, width=15).grid(row=6, column=0, padx=10, pady=10)
+        
+        company_entry = tk.Entry(mid_frame, bg=BG_WIDGET, fg=FG_TEXT, font=BUTTON_FONT, width=15)
+        title_entry = tk.Entry(mid_frame, bg=BG_WIDGET, fg=FG_TEXT, font=BUTTON_FONT, width=15)
+        status_entry = tk.Entry(mid_frame, bg=BG_WIDGET, fg=FG_TEXT, font=BUTTON_FONT, width=15)
+        date_applied_entry = tk.Entry(mid_frame, bg=BG_WIDGET, fg=FG_TEXT, font=BUTTON_FONT, width=15)
+        location_entry = tk.Entry(mid_frame, bg=BG_WIDGET, fg=FG_TEXT, font=BUTTON_FONT, width=15)
+        notes_entry = tk.Entry(mid_frame, bg=BG_WIDGET, fg=FG_TEXT, font=BUTTON_FONT, width=15)
+        link_entry = tk.Entry(mid_frame, bg=BG_WIDGET, fg=FG_TEXT, font=BUTTON_FONT, width=15)
+
+        company_entry.grid(row=0, column=2, padx=10, pady=10)
+        title_entry.grid(row=1, column=2, padx=10, pady=10)
+        status_entry.grid(row=2, column=2, padx=10, pady=10)
+        date_applied_entry.grid(row=3, column=2, padx=10, pady=10)
+        location_entry.grid(row=4, column=2, padx=10, pady=10)
+        notes_entry.grid(row=5, column=2, padx=10, pady=10)
+        link_entry.grid(row=6, column=2, padx=10, pady=10)
+
+        tk.Button(bot_frame, bg=BG_WIDGET, fg=FG_TEXT, text="Save", font=BUTTON_FONT, width=15, command=on_save_job).grid(row=0, column=0, columnspan=1, pady=10)
+        tk.Button(bot_frame, bg=BG_WIDGET, fg=FG_TEXT, text="Back", font=BUTTON_FONT, width=15, command=main_menu).grid(row=1, column=0, columnspan=1, pady=10)
+
+    def render_view_job():
+        title_label = tk.Label(top_frame, bg=BG_MAIN, fg=FG_TEXT, text="Job Applications", font=TITLE_FONT)
+        title_label.pack(pady=20)
+
+        job_listbox = tk.Listbox(mid_frame, width=50, height=20, font=BUTTON_FONT)
+        for job in jobs:
+            job_listbox.insert(tk.END, job)
+        job_listbox.pack()
+
+        tk.Button(bot_frame, bg=BG_WIDGET, fg=FG_TEXT, text="Edit", font=BUTTON_FONT, width=15, command=on_edit_job).grid(row=0, column=0, columnspan=1, pady=10)
+        tk.Button(bot_frame, bg=BG_WIDGET, fg=FG_TEXT, text="Back", font=BUTTON_FONT, width=15, command=main_menu).grid(row=1, column=0, columnspan=1, pady=10)
 
     def render_edit_job():
         return
-
-    def render_view_jobs():
-        return
         
-
-
+    
     #state if chain
     if state == "main":
         render_main()
@@ -63,7 +157,5 @@ def start_gui():
         render_add_job()
     elif state == "edit_job":
         render_edit_job()
-    elif state == "view_jobs":
-        render_view_jobs()
 
     root.mainloop()
