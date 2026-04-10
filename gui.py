@@ -1,5 +1,6 @@
 import tkinter as tk
 from job import Job
+from datetime import datetime
 from db import insert_job, view_db, clear_db, update_db
 
 TITLE_FONT = ("Helvetica", 18, "bold")
@@ -140,6 +141,8 @@ def start_gui():
     def render_add_job():
         nonlocal company_entry, title_entry, status_var, status_entry, date_applied_entry, location_entry, notes_entry, link_entry
 
+        today = datetime.now().strftime("%m/%d/%Y")
+
         title_label = tk.Label(top_frame, bg=BG_MAIN, fg=FG_TEXT, text="Add Job Application", font=TITLE_FONT)
         title_label.pack(pady=20)
 
@@ -163,6 +166,7 @@ def start_gui():
         status_entry = tk.OptionMenu(form_frame, status_var, "Applied", "Interview", "Rejected", "Offer")
         status_entry.config(bg=BG_WIDGET, fg=FG_TEXT, font=BUTTON_FONT, width=12)
         date_applied_entry = tk.Entry(form_frame, bg=BG_WIDGET, fg=FG_TEXT, font=BUTTON_FONT, width=15)
+        date_applied_entry.insert(0, today)
         location_entry = tk.Entry(form_frame, bg=BG_WIDGET, fg=FG_TEXT, font=BUTTON_FONT, width=15)
         notes_entry = tk.Entry(form_frame, bg=BG_WIDGET, fg=FG_TEXT, font=BUTTON_FONT, width=15)
         link_entry = tk.Entry(form_frame, bg=BG_WIDGET, fg=FG_TEXT, font=BUTTON_FONT, width=15)
@@ -187,7 +191,8 @@ def start_gui():
 
         job_listbox = tk.Listbox(mid_frame, width=50, height=20, font=BUTTON_FONT)
         for job in jobs:
-            job_listbox.insert(tk.END, job)
+            display_text = f"ID:{job[0] or 'N/A'} | {job[1] or 'N/A'} | {job[2] or 'N/A'} | {job[3] or 'N/A'} | {job[4] or 'N/A'} | {job[5] or 'N/A'} | {job[6] or 'N/A'} | {job[7] or 'N/A'}"
+            job_listbox.insert(tk.END, display_text)
         job_listbox.pack()
 
         button_frame = tk.Frame(mid_frame, bg=BG_MAIN)

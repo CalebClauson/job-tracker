@@ -1,5 +1,7 @@
 import sqlite3
 from job import Job
+import os
+
 
 #LEFT FOR CONTEXT OF DB
 #Initial Database created
@@ -14,6 +16,24 @@ from job import Job
 #             notes TEXT,
 #             link TEXT
 #            )""")
+
+def create_db():
+    conn = sqlite3.connect("jobs.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS jobs(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            company TEXT,
+            title TEXT,
+            status TEXT,
+            date_applied TEXT,
+            location TEXT,
+            notes TEXT,
+            link TEXT
+        )
+    """)
+    conn.commit()
+    conn.close()
 
 def insert_job(job):
     conn = sqlite3.connect("jobs.db")
@@ -42,8 +62,6 @@ def update_db(edit_job_id, job):
 
 
 def clear_db():
-    conn = sqlite3.connect("jobs.db")
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM jobs")
-    conn.commit()
-    conn.close()
+    if os.path.exists("jobs.db"):
+        os.remove("jobs.db")
+        create_db()
