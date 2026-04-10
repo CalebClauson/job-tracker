@@ -1,7 +1,7 @@
 import tkinter as tk
 from job import Job
 from datetime import datetime
-from db import insert_job, view_db, clear_db, update_db
+from db import insert_job, view_db, clear_db, update_db, delete_db
 
 TITLE_FONT = ("Helvetica", 18, "bold")
 BUTTON_FONT = ("Helvetica", 12)
@@ -34,6 +34,7 @@ def start_gui():
 
     #editing variables
     edit_job_id = None
+    delete_job_id = None
     jobs = None
     job_listbox = None
     selected_job = None
@@ -94,6 +95,19 @@ def start_gui():
         state = "edit_job"
         render_edit_job()
 
+    def delete_job():
+        nonlocal state, jobs, job_listbox, selected_job, delete_job_id
+
+        if not job_listbox.curselection():
+            return
+
+        selected_index = job_listbox.curselection()[0]
+        selected_job = jobs[selected_index]
+        delete_job_id = selected_job[0]
+        delete_db(delete_job_id)
+        clear_all_frames()
+        render_view_job()
+    
     #helper for backend
     def on_save_job():
         nonlocal company_entry, title_entry, status_var, date_applied_entry, location_entry, notes_entry, link_entry
@@ -196,10 +210,11 @@ def start_gui():
         job_listbox.pack()
 
         button_frame = tk.Frame(mid_frame, bg=BG_MAIN)
-        button_frame.pack(pady=20)
+        button_frame.pack(pady=10)
 
         tk.Button(button_frame, bg=BG_WIDGET, fg=FG_TEXT, text="Edit", font=BUTTON_FONT, width=15, command=edit_job).pack()
-        tk.Button(bot_frame, bg=BG_WIDGET, fg=FG_TEXT, text="Back", font=BUTTON_FONT, width=15, command=main_menu).place(relx=0.0, rely=1.0, x=15, y=-15, anchor="sw")
+        tk.Button(button_frame, bg=BG_WIDGET, fg=FG_TEXT, text="Delete", font=BUTTON_FONT, width=15, command=delete_job).pack()
+        tk.Button(bot_frame, bg=BG_WIDGET, fg=FG_TEXT, text="Back", font=BUTTON_FONT, width=15, command=main_menu).place(relx=0.0, rely=1.0, x=15, y=-5, anchor="sw")
 
     def render_edit_job():
         nonlocal company_entry, title_entry, status_var, status_entry, date_applied_entry, location_entry, notes_entry, link_entry, selected_job

@@ -60,6 +60,12 @@ def update_db(edit_job_id, job):
     conn.commit()
     conn.close()
 
+def delete_db(delete_job_id):
+    conn = sqlite3.connect("jobs.db")
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM jobs WHERE id = ?", (delete_job_id,))
+    conn.commit()
+    conn.close()
 
 def clear_db():
     if os.path.exists("jobs.db"):
