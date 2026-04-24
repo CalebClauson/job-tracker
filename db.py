@@ -3,20 +3,6 @@ from job import Job
 import os
 
 
-#LEFT FOR CONTEXT OF DB
-#Initial Database created
-# cursor.execute("""
-#            CREATE TABLE jobs(
-#             id INTEGER PRIMARY KEY AUTOINCREMENT,
-#             company TEXT,
-#             title TEXT,
-#             status TEXT,
-#             date_applied TEXT,
-#             location TEXT,
-#             notes TEXT,
-#             link TEXT
-#            )""")
-
 def create_db():
     conn = sqlite3.connect("jobs.db")
     cursor = conn.cursor()
@@ -42,13 +28,34 @@ def insert_job(job):
     conn.commit()
     conn.close()
 
-def view_db():
+def view_db(sort_by="id", descending=False):
+    allowed_sorts = {
+        "id": "id",
+        "name": "company",
+        "title": "title"
+    }
+
+    column = allowed_sorts.get(sort_by, "id")
+    direction = "DESC" if descending else "ASC"
+
     conn = sqlite3.connect("jobs.db")
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM jobs")
+
+    cursor.execute(f"SELECT * FROM jobs ORDER BY {column} {direction}")
+
     db = cursor.fetchall()
     conn.close()
+
     return db
+
+def sort_id():
+    return
+
+def sort_name():
+    return
+
+def sort_title():
+    return
 
 def update_db(edit_job_id, job):
     conn = sqlite3.connect("jobs.db")

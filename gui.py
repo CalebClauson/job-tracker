@@ -17,8 +17,8 @@ def start_gui():
     root.title("Job-Tracker")
     root.geometry("800x600")
     root.resizable(False, False)
-    root.maxsize(800, 600)
-    root.minsize(800, 600)
+    root.maxsize(800, 700)
+    root.minsize(800, 700)
     root.configure(bg=BG_MAIN)
     state = "main"
 
@@ -38,6 +38,11 @@ def start_gui():
     jobs = None
     job_listbox = None
     selected_job = None
+
+    #sorting variable
+    current_sort = "id"
+    sort_descending = False
+
 
     #frame definition
     top_frame = tk.Frame(root, bg=BG_MAIN)
@@ -107,6 +112,19 @@ def start_gui():
         delete_db(delete_job_id)
         clear_all_frames()
         render_view_job()
+
+    #sorting
+    def change_sort(sort_by):
+        nonlocal current_sort, sort_descending
+
+        if current_sort == sort_by:
+            sort_descending = not sort_descending
+        else:
+            current_sort = sort_by
+            sort_descending = False
+
+        clear_all_frames()
+        render_view_job(current_sort, sort_descending)
     
     #helper for backend
     def on_save_job():
@@ -196,17 +214,28 @@ def start_gui():
         tk.Button(button_frame, bg=BG_WIDGET, fg=FG_TEXT, text="Save", font=BUTTON_FONT, width=15, command=on_save_job).grid(row=0, column=0, pady=10)
         tk.Button(button_frame, bg=BG_WIDGET, fg=FG_TEXT, text="Back", font=BUTTON_FONT, width=15, command=main_menu).grid(row=1, column=0, pady=10)
 
-    def render_view_job():
+    def render_view_job(sort_by="id", descending=False):
         nonlocal jobs, job_listbox
-        jobs = view_db()
+
+        jobs = view_db(sort_by, descending)
 
         title_label = tk.Label(top_frame, bg=BG_MAIN, fg=FG_TEXT, text="Job Applications", font=TITLE_FONT)
         title_label.pack(pady=20)
 
+        sort_frame = tk.Frame(top_frame, bg=BG_MAIN)
+        sort_frame.pack(pady=5)
+
+        tk.Button(sort_frame, text="Company", command=lambda: change_sort("company")).grid(row=0, column=0, padx=5)
+        tk.Button(sort_frame, text="Title", command=lambda: change_sort("title")).grid(row=0, column=1, padx=5)
+        tk.Button(sort_frame, text="Status", command=lambda: change_sort("status")).grid(row=0, column=2, padx=5)
+        tk.Button(sort_frame, text="Date", command=lambda: change_sort("date")).grid(row=0, column=3, padx=5)
+
         job_listbox = tk.Listbox(mid_frame, width=50, height=20, font=BUTTON_FONT)
+
         for job in jobs:
             display_text = f"ID:{job[0] or 'N/A'} | {job[1] or 'N/A'} | {job[2] or 'N/A'} | {job[3] or 'N/A'} | {job[4] or 'N/A'} | {job[5] or 'N/A'} | {job[6] or 'N/A'} | {job[7] or 'N/A'}"
             job_listbox.insert(tk.END, display_text)
+
         job_listbox.pack()
 
         button_frame = tk.Frame(mid_frame, bg=BG_MAIN)
@@ -214,7 +243,8 @@ def start_gui():
 
         tk.Button(button_frame, bg=BG_WIDGET, fg=FG_TEXT, text="Edit", font=BUTTON_FONT, width=15, command=edit_job).pack()
         tk.Button(button_frame, bg=BG_WIDGET, fg=FG_TEXT, text="Delete", font=BUTTON_FONT, width=15, command=delete_job).pack()
-        tk.Button(bot_frame, bg=BG_WIDGET, fg=FG_TEXT, text="Back", font=BUTTON_FONT, width=15, command=main_menu).place(relx=0.0, rely=1.0, x=15, y=-5, anchor="sw")
+        tk.Button(button_frame, bg=BG_WIDGET, fg=FG_TEXT, text="Back", font=BUTTON_FONT, width=15, command=main_menu).pack()
+
 
     def render_edit_job():
         nonlocal company_entry, title_entry, status_var, status_entry, date_applied_entry, location_entry, notes_entry, link_entry, selected_job
