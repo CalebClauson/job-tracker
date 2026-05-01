@@ -1,6 +1,5 @@
-import sqlite3
-from job import Job
 import os
+import sqlite3
 
 
 def create_db():
@@ -21,19 +20,20 @@ def create_db():
     conn.commit()
     conn.close()
 
+
 def insert_job(job):
     conn = sqlite3.connect("jobs.db")
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO jobs (company, title, status, date_applied, location, notes, link) VALUES (?, ?, ?, ?, ?, ?, ?)", job.to_tuple())
+    cursor.execute(
+        "INSERT INTO jobs (company, title, status, date_applied, location, notes, link) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        job.to_tuple(),
+    )
     conn.commit()
     conn.close()
 
+
 def view_db(sort_by="id", descending=False):
-    allowed_sorts = {
-        "id": "id",
-        "name": "company",
-        "title": "title"
-    }
+    allowed_sorts = {"id": "id", "name": "company", "title": "title"}
 
     column = allowed_sorts.get(sort_by, "id")
     direction = "DESC" if descending else "ASC"
@@ -48,24 +48,17 @@ def view_db(sort_by="id", descending=False):
 
     return db
 
-def sort_id():
-    return
-
-def sort_name():
-    return
-
-def sort_title():
-    return
 
 def update_db(edit_job_id, job):
     conn = sqlite3.connect("jobs.db")
     cursor = conn.cursor()
     cursor.execute(
         "UPDATE jobs SET company = ?, title = ?, status = ?, date_applied = ?, location = ?, notes = ?, link = ? WHERE id = ?",
-        job.to_tuple() + (edit_job_id,)
+        job.to_tuple() + (edit_job_id,),
     )
     conn.commit()
     conn.close()
+
 
 def delete_db(delete_job_id):
     conn = sqlite3.connect("jobs.db")
@@ -73,6 +66,7 @@ def delete_db(delete_job_id):
     cursor.execute("DELETE FROM jobs WHERE id = ?", (delete_job_id,))
     conn.commit()
     conn.close()
+
 
 def clear_db():
     if os.path.exists("jobs.db"):
